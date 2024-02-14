@@ -1,6 +1,7 @@
 import {initializeApp} from 'firebase/app';
-import {getAuth, signInWithRedirect,signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged} from 'firebase/auth';
-import {doc, getFirestore,getDoc, setDoc} from 'firebase/firestore';
+import {getAuth, signInWithRedirect,signInWithPopup, GoogleAuthProvider,
+   createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged} from 'firebase/auth';
+import {doc, getFirestore,getDoc, setDoc, collection,writeBatch} from 'firebase/firestore';
 
 const firebaseConfig = {
     apiKey: "AIzaSyCissUTKLg5zFt-5xNPkiy_IxnWOEv122g",
@@ -26,6 +27,18 @@ export const signInWithGoogleRedirect = () => signInWithRedirect(auth, provider)
 
 
 export const db = getFirestore();
+
+export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => {
+  const batch = writeBatch(db);
+  const collectionRef = collection(db,collectionKey);
+  console.log(objectsToAdd);
+  objectsToAdd.forEach((object)=>{
+    const docRef = doc(collectionRef, object.title.toLowerCase());
+    batch.set(docRef, object);
+  });
+
+  await batch.commit();
+}
 
 export const createUserDocumentFromAuth = async (
   userAuth,
